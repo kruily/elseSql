@@ -1,34 +1,10 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 )
-
-const (
-	dbTag  = "db"
-	INSERT = "insert"
-	DELETE = "delete"
-	UPDATE = "update"
-	SELECT = "select"
-)
-
-var NoTableSpecified = errors.New("未指定表名")
-var ErrorSelector = errors.New("错误的选择器")
-var ErrorParseStruct = errors.New("非可解析对象")
-var ErrorOperate = errors.New("非支持的数据库操作形式：insert，delete，update，select")
-var ErrorNilApp = errors.New("空的elseSql应用")
-
-//var Error
-
-type Application struct {
-	Table    string `json:"table"`                // 表名
-	Selector string `json:"selector" default:"*"` // 选择器
-	Exclude  string `json:"exclude"`              // 排除器
-	Operate  string `json:"operate"`              // 操作值：select create update delete insert
-}
 
 //IsEmpty 校验对象是否未空值
 func IsEmpty(obj interface{}) bool {
@@ -65,13 +41,6 @@ func NewElseApp(table, operate string) (*Application, error) {
 	default:
 		return nil, ErrorOperate
 	}
-
-	//if !IsEmpty(selector) {
-	//	app.Selector = selector
-	//}
-	//if !IsEmpty(exclude) {
-	//	app.Exclude = exclude
-	//}
 	return app, nil
 }
 
@@ -85,7 +54,6 @@ func (a *Application) ParseStruct(st interface{}) error {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	var pg bool
 	// we only accept structs
 	if v.Kind() != reflect.Struct {
 		//panic(fmt.Errorf("ToMap only accepts structs; got %T", v))
@@ -93,18 +61,13 @@ func (a *Application) ParseStruct(st interface{}) error {
 	}
 	typ := v.Type()
 	for i := 0; i < v.NumField(); i++ {
-		// gets us a StructField
 		fi := typ.Field(i)
 		tagv := fi.Tag.Get(dbTag)
 		switch tagv {
 		case "-":
 			continue
 		case "":
-			if pg {
-				out = append(out, fi.Name)
-			} else {
-				out = append(out, fmt.Sprintf("`%s`", fi.Name))
-			}
+			out = append(out, fmt.Sprintf("`%s`", fi.Name))
 		default:
 			if strings.Contains(tagv, ",") {
 				tagv = strings.TrimSpace(strings.Split(tagv, ",")[0])
@@ -112,11 +75,7 @@ func (a *Application) ParseStruct(st interface{}) error {
 			if len(tagv) == 0 {
 				tagv = fi.Name
 			}
-			if pg {
-				out = append(out, tagv)
-			} else {
-				out = append(out, fmt.Sprintf("`%s`", tagv))
-			}
+			out = append(out, fmt.Sprintf("`%s`", tagv))
 		}
 	}
 	a.Selector = strings.Join(out, ",")
@@ -221,7 +180,3 @@ func (a *Application) Join(join, on string) *Application {
 	}
 	return a
 }
-
-//func (a *Application) Set(col string) *Application {
-//
-//}

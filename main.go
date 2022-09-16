@@ -20,7 +20,7 @@ func main() {
 		return
 	}
 	//app.Emit("`password`,id")
-	app.And("id = 1234").And("username = 'test'")
+	app.And("id = 1234").And("username = 'test'").And("password = '12345'")
 	fmt.Printf("%#v\n", app)
 	query, _ := app.Result()
 	fmt.Printf("result: %#v\n", query)
