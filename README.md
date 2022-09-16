@@ -3,7 +3,7 @@
 
 ## 安装
 ```shell
-go get github.com/jingxiu/elseSql
+go get github.com/jingxiu1016/elseSql
 ```
 ## 使用
 

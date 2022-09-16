@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	app, err := core.NewElseApp("maile_user", "update")
+	app, err := core.NewElseApp("maile_user", "select")
 	if err != nil && app == nil {
 		fmt.Println(err.Error())
 	}
@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(err.Error())
 		return
 	}
-	app.Emit("`password`,id")
+	//app.Emit("`password`,id")
 	app.And("id = 1234").And("username = 'test'")
 	fmt.Printf("%#v\n", app)
 	query, _ := app.Result()
